@@ -7,31 +7,54 @@
       body { font: 13px Helvetica, Arial; }
       form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
       form input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
-      form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
+      form .button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
       #messages { list-style-type: none; margin: 0; padding: 0; }
       #messages li { padding: 5px 10px; }
       #messages li:nth-child(odd) { background: #eee; }
     </style>
   </head>
   <body>
-    <ul id="messages"></ul>
-    <form action="">
-      <input id="m" autocomplete="off" /><button>Send</button>
+    <canvas id="map" width="1024" height="900"></canvas>
+    <form>
+      <span class="button" id="calibrate">Calibrate</span>
+      <span class="button" id="scan">Scan</span>
     </form>
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
     <script>
         $(function () {
-        var socket = io();
-            $('form').submit(function(){
-                socket.emit('chat message', $('#m').val());
-                $('#m').val('');
-                return false;
-            });
-            socket.on('chat message', function(msg){
-                $('#messages').append($('<li>').text(msg));
-            });
+          var canvas = document.getElementById('map')
+          var ctx = canvas.getContext('2d')
+          var socket = io();
+            socket.on('calibration', function(corners) {
+              ctx.clearRect(0,0, canvas.width, canvas.height)
+              corners.forEach(corner => {
+                ctx.fillRect(corner.x, corner.y, 3, 3)
+              });
+            })
+            socket.on('tile-movement', function(markers) {
+              ctx.clearRect(0,0, canvas.width, canvas.height)
+              markers.forEach(marker => {
+                ctx.fillStyle="#f00"
+                ctx.beginPath()
+                ctx.moveTo(marker.corners[0].x, marker.corners[0].y)
+                marker.corners.forEach(corner => {
+                  ctx.lineTo(corner.x, corner.y)
+                })
+                ctx.closePath()
+                ctx.fill()
+              })
+            })
+            $('#calibrate').click( function(e) {
+              console.log('calibrate')
+              socket.emit('calibrate')
+            })
+            $('#scan').click( function(e) {
+              console.log('scan')
+              socket.emit('scan')
+            })
         });
+        
     </script>
   </body>
 </html>
