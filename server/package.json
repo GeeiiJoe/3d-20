@@ -9,7 +9,7 @@
     "js-aruco": "^0.1.0",
     "koa": "^2.5.1",
     "koa-static": "^4.0.2",
-    "opencv4nodejs": "^4.4.0",
+    "opencv4nodejs": "^4.5.0",
     "socket.io": "^2.1.0"
   },
   "devDependencies": {

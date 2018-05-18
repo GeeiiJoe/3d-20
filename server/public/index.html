@@ -27,7 +27,7 @@
           var ctx = canvas.getContext('2d')
           var socket = io();
             socket.on('calibration', function(corners) {
-              ctx.clearRect(0,0, canvas.width, canvas.height)
+              //ctx.clearRect(0,0, canvas.width, canvas.height)
               corners.forEach(corner => {
                 ctx.fillRect(corner.x, corner.y, 3, 3)
               });
@@ -44,6 +44,15 @@
                 ctx.closePath()
                 ctx.fill()
               })
+            })
+            socket.on('frame', function(data) {
+              console.log('ok')
+              var img = new Image();
+              console.log(data)
+              img.onload = function() {
+                ctx.drawImage(img,0,0)
+              }
+              img.src = 'data:image/jpeg;base64,' + data
             })
             $('#calibrate').click( function(e) {
               console.log('calibrate')
